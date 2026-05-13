@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>mos6502fan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d1117;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #c9d1d9;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1012px;
+            margin: 0 auto;
+            background: #0d1117;
+        }
+
+        .profile-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .handle {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #f0f6fc;
+            letter-spacing: -0.5px;
+            line-height: 1.25;
+            margin-bottom: 0.5rem;
+        }
+
+        .bio-tagline {
+            color: #8b949e;
+            font-size: 1rem;
+        }
+
+        /* статистика — только счётчик репозиториев */
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 0.75rem 1.2rem;
+            border: 1px solid #21262d;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        /* тепловая карта */
+        .heatmap-section {
+            background: #161b22;
+            border-radius: 16px;
+            border: 1px solid #21262d;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .heatmap-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .contrib-count {
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+
+        .heatmap-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .heatmap-week {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .heatmap-day {
+            width: 12px;
+            height: 12px;
+            background-color: #161b22;
+            border-radius: 2px;
+            transition: transform 0.05s ease;
+        }
+
+        .level-0 { background-color: #161b22; }
+        .level-1 { background-color: #0e4429; }
+        .level-2 { background-color: #006d32; }
+        .level-3 { background-color: #26a641; }
+        .level-4 { background-color: #39d353; }
+
+        .heatmap-day:hover {
+            transform: scale(1.2);
+            outline: 1px solid #8b949e;
+        }
+
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.7rem;
+            color: #6e7681;
+        }
+
+        .legend-colors {
+            display: flex;
+            gap: 0.2rem;
+            align-items: center;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* репозитории */
+        .repo-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .repo-card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .repo-card:hover {
+            border-color: #3a3f47;
+        }
+
+        .repo-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .repo-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .repo-name a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        .repo-name a:hover {
+            text-decoration: underline;
+        }
+
+        .repo-language {
+            font-size: 0.75rem;
+            background: #21262d;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            color: #c9d1d9;
+        }
+
+        .repo-description {
+            font-size: 0.9rem;
+            color: #c9d1d9;
+            margin-bottom: 0.75rem;
+        }
+
+        .repo-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #8b949e;
+            align-items: center;
+        }
+
+        .star-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .pinned-badge {
+            border: 1px solid #3fb950;
+            color: #3fb950;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            text-align: center;
+            color: #6e7681;
+            border-top: 1px solid #21262d;
+            padding-top: 1.5rem;
+        }
+
+        .loading {
+            opacity: 0.6;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .repo-card {
+                padding: 1rem;
+            }
+            .heatmap-day {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        .glow-text {
+            background: linear-gradient(135deg, #f0f6fc 0%, #c9d1d9 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="profile-header">
+        <div class="handle">
+            @mos6502fan · Algorithm Intensity
+        </div>
+        <h1>
+            <span class="glow-text">эм ну тут типа что-то про меня итд</span>
+        </h1>
+        <div class="bio-tagline">
+            Windows media player without bloatware. Open, play, enjoy.<br>
+            builder · low-level explorer · keep it lean
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" id="repoCountCard">
+            <span class="stat-number" id="repoCountValue">--</span>
+            <span class="stat-label">public repositories</span>
+        </div>
+    </div>
+
+    <div class="heatmap-section">
+        <div class="heatmap-title">
+            <span>📆 <span class="contrib-count">30 contributions</span> in the last year</span>
+            <span>May 13, 2026 — activity data</span>
+        </div>
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+        <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="legend-colors">
+                <div class="legend-color level-0"></div>
+                <div class="legend-color level-1"></div>
+                <div class="legend-color level-2"></div>
+                <div class="legend-color level-3"></div>
+                <div class="legend-color level-4"></div>
+            </div>
+            <span>More</span>
+        </div>
+    </div>
+
+    <h2 style="font-size: 1.25rem; font-weight: 500; margin-bottom: 1rem; border-left: 3px solid #58a6ff; padding-left: 0.75rem;">
+        📌 Projects
+    </h2>
+    <div class="repo-grid" id="repoGrid">
+        <div class="repo-card loading">
+            <div class="repo-header">
+                <div class="repo-name">Loading repositories...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <a href="https://github.com/mos6502fan" target="_blank" rel="noopener noreferrer">GitHub · mos6502fan</a>
+            <a href="https://mos6502fan.github.io/NorowaretaKiroku/" target="_blank" rel="noopener noreferrer">Norowareta Kiroku (live)</a>
+            <a href="https://github.com/mos6502fan/Flux" target="_blank" rel="noopener noreferrer">Flux repository</a>
+        </div>
+        <div>Windows media player without bloatware · open, play, enjoy</div>
+    </footer>
+</div>
+
+<script>
+      async function generateHeatmap() {
+          const username = 'mos6502fan';
+          const container = document.getElementById('heatmapGrid');
+          container.innerHTML = '<div style="padding: 1rem; text-align: center;">Loading...</div>';
+          
+          try {
+              const response = await fetch(`https://api.github.com/users/${username}/events?per_page=100`);
+              if (!response.ok) throw new Error();
+              
+              const events = await response.json();
+              const contributions = {};
+              
+              events.forEach(event => {
+                  if (event.type === 'PushEvent' || event.type === 'CreateEvent' || event.type === 'PullRequestEvent') {
+                      const date = event.created_at.split('T')[0];
+                      contributions[date] = (contributions[date] || 0) + 1;
+                  }
+              });
+              
+              const endDate = new Date();
+              const startDate = new Date();
+              startDate.setFullYear(endDate.getFullYear() - 1);
+              
+              const weeksCount = 53;
+              const allLevels = [];
+              
+              for (let w = 0; w < weeksCount; w++) {
+                  const week = [];
+                  for (let d = 0; d < 7; d++) {
+                      const currentDate = new Date(startDate);
+                      currentDate.setDate(startDate.getDate() + (w * 7) + d);
+                      const dateStr = currentDate.toISOString().split('T')[0];
+                      const count = contributions[dateStr] || 0;
+                      
+                      let level = 0;
+                      if (count > 0) level = 1;
+                      if (count >= 2) level = 2;
+                      if (count >= 4) level = 3;
+                      if (count >= 7) level = 4;
+                      
+                      week.push(level);
+                  }
+                  allLevels.push(week);
+              }
+              
+              container.innerHTML = '';
+              
+              for (let day = 0; day < 7; day++) {
+                  const weekRow = document.createElement('div');
+                  weekRow.className = 'heatmap-week';
+                  for (let week = 0; week < weeksCount; week++) {
+                      const dayCell = document.createElement('div');
+                      dayCell.className = `heatmap-day level-${allLevels[week][day]}`;
+                      weekRow.appendChild(dayCell);
+                  }
+                  container.appendChild(weekRow);
+              }
+              
+              const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
+              const monthStartWeeks = [0, 4, 8, 13, 17, 22, 26, 30, 35, 39, 44, 48, 52];
+              const labelsDiv = document.createElement('div');
+              labelsDiv.style.display = 'flex';
+              labelsDiv.style.gap = '0.2rem';
+              labelsDiv.style.marginTop = '0.5rem';
+              labelsDiv.style.fontSize = '0.7rem';
+              labelsDiv.style.color = '#6e7681';
+              for (let i = 0; i < monthStartWeeks.length; i++) {
+                  const span = document.createElement('span');
+                  span.style.width = '12px';
+                  span.style.textAlign = 'center';
+                  span.textContent = months[i] || '';
+                  labelsDiv.appendChild(span);
+              }
+              container.appendChild(labelsDiv);
+              
+          } catch (error) {
+              container.innerHTML = '<div style="padding: 1rem; text-align: center;">Could not load contribution data</div>';
+          }
+      }
+    
+    async function fetchGitHubData() {
+        const username = 'mos6502fan';
+        const apiUrl = `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`;
+        
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('API request failed');
+            const repos = await response.json();
+            
+            const repoCount = repos.length;
+            document.getElementById('repoCountValue').textContent = repoCount;
+            
+            const targetRepos = ['NorowaretaKiroku', 'Flux'];
+            const filteredRepos = repos.filter(repo => targetRepos.includes(repo.name));
+            
+            if (filteredRepos.length === 0) {
+                showFallbackRepos();
+                return;
+            }
+            
+            renderRepos(filteredRepos);
+        } catch (error) {
+            console.error('Error fetching repos:', error);
+            showFallbackRepos();
+        }
+    }
+    
+    function showFallbackRepos() {
+        const fallbackRepos = [
+            {
+                name: 'NorowaretaKiroku',
+                html_url: 'https://github.com/mos6502fan/NorowaretaKiroku',
+                language: 'JavaScript',
+                description: 'Cursed / atmospheric interactive project — explore the unknown.',
+                stargazers_count: 0,
+                homepage: 'https://mos6502fan.github.io/NorowaretaKiroku/'
+            },
+            {
+                name: 'Flux',
+                html_url: 'https://github.com/mos6502fan/Flux',
+                language: 'C#',
+                description: 'Windows media player without bloatware. Open, play, enjoy. Minimalist, fast, no telemetry.',
+                stargazers_count: 0,
+                homepage: null
+            }
+        ];
+        renderRepos(fallbackRepos);
+        document.getElementById('repoCountValue').textContent = '2';
+    }
+    
+    function renderRepos(repos) {
+        const container = document.getElementById('repoGrid');
+        container.innerHTML = '';
+        
+        repos.forEach(repo => {
+            const card = document.createElement('div');
+            card.className = 'repo-card';
+            
+            const languageColor = repo.language === 'JavaScript' ? '#f1e05a' : '#178600';
+            
+            card.innerHTML = `
+                <div class="repo-header">
+                    <div class="repo-name">
+                        <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
+                            ${repo.name}
+                        </a>
+                    </div>
+                    <div class="repo-language">${repo.language || 'N/A'}</div>
+                </div>
+                <div class="repo-description">
+                    ${repo.description || 'No description provided.'}
+                </div>
+                <div class="repo-meta">
+                    <span class="star-count">
+                        ⭐ ${repo.stargazers_count ?? 0} stars
+                    </span>
+                    ${repo.homepage ? `<span>🔗 <a href="${repo.homepage}" target="_blank" rel="noopener noreferrer">live demo</a></span>` : ''}
+                    <span class="pinned-badge">pinned</span>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+    
+    generateHeatmap();
+    fetchGitHubData();
+</script>
+</body>
+</html>
