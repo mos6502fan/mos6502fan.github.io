@@ -433,7 +433,7 @@
             const repoCount = repos.length;
             document.getElementById('repoCountValue').textContent = repoCount;
             
-            const targetRepos = ['NorowaretaKiroku', 'Flux'];
+            const targetRepos = ['NorowaretaKiroku', 'Flux', 'OpenWorld'];
             const filteredRepos = repos.filter(repo => targetRepos.includes(repo.name));
             
             if (filteredRepos.length === 0) {
